@@ -132,48 +132,94 @@ func parseEventEnd(eventData *string) (time.Time, string) {
 }
 
 // ParseISODuration parses an ISO 8601 duration string and returns a time.Duration
-// Supports format like PT1H30M45S (1 hour, 30 minutes, 45 seconds)
+// Supports full ISO 8601 format: P[n]Y[n]M[n]DT[n]H[n]M[n]S with flexible ordering and fractions
 func ParseISODuration(durationStr string) (time.Duration, error) {
 	if durationStr == "" {
 		return 0, nil
 	}
 
-	// Remove the 'P' prefix if present
-	if strings.HasPrefix(durationStr, "P") {
-		durationStr = durationStr[1:]
+	// Check for 'P' prefix
+	if !strings.HasPrefix(durationStr, "P") {
+		return 0, fmt.Errorf("invalid ISO 8601 duration: missing 'P' prefix")
 	}
+	durationStr = durationStr[1:]
 
 	// Split by 'T' to separate date and time parts
-	parts := strings.Split(durationStr, "T")
-	var timePart string
+	parts := strings.SplitN(durationStr, "T", 2)
+	datePart := parts[0]
+	timePart := ""
 	if len(parts) > 1 {
 		timePart = parts[1]
-	} else {
-		timePart = parts[0]
 	}
 
-	var totalSeconds int64
+	var totalSeconds float64
 
-	// Parse time components (H, M, S)
-	timeRegex := regexp.MustCompile(`(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?`)
-	matches := timeRegex.FindStringSubmatch(timePart)
+	// Regex to match number (with optional fraction) followed by unit
+	componentRegex := regexp.MustCompile(`(\d+(?:\.\d+)?)([YMWDHMS])`)
 
-	if len(matches) >= 4 {
-		if matches[1] != "" {
-			hours, _ := strconv.ParseInt(matches[1], 10, 64)
-			totalSeconds += hours * 3600
+	// Parse date part (Y, M=months, W, D)
+	if datePart != "" {
+		matches := componentRegex.FindAllStringSubmatch(datePart, -1)
+		matchedStr := ""
+		for _, match := range matches {
+			matchedStr += match[0]
+			if len(match) != 3 {
+				continue
+			}
+			value, err := strconv.ParseFloat(match[1], 64)
+			if err != nil {
+				return 0, fmt.Errorf("invalid number in duration: %s", match[1])
+			}
+			unit := match[2]
+			switch unit {
+			case "Y":
+				totalSeconds += value * 365.25 * 24 * 3600 // approximate year
+			case "M":
+				totalSeconds += value * 30.44 * 24 * 3600 // approximate month
+			case "W":
+				totalSeconds += value * 7 * 24 * 3600
+			case "D":
+				totalSeconds += value * 24 * 3600
+			default:
+				return 0, fmt.Errorf("invalid unit in date part: %s", unit)
+			}
 		}
-		if matches[2] != "" {
-			minutes, _ := strconv.ParseInt(matches[2], 10, 64)
-			totalSeconds += minutes * 60
-		}
-		if matches[3] != "" {
-			seconds, _ := strconv.ParseInt(matches[3], 10, 64)
-			totalSeconds += seconds
+		if matchedStr != datePart {
+			return 0, fmt.Errorf("invalid characters in date part: %s", datePart)
 		}
 	}
 
-	return time.Duration(totalSeconds) * time.Second, nil
+	// Parse time part (H, M=minutes, S)
+	if timePart != "" {
+		matches := componentRegex.FindAllStringSubmatch(timePart, -1)
+		matchedStr := ""
+		for _, match := range matches {
+			matchedStr += match[0]
+			if len(match) != 3 {
+				continue
+			}
+			value, err := strconv.ParseFloat(match[1], 64)
+			if err != nil {
+				return 0, fmt.Errorf("invalid number in duration: %s", match[1])
+			}
+			unit := match[2]
+			switch unit {
+			case "H":
+				totalSeconds += value * 3600
+			case "M":
+				totalSeconds += value * 60
+			case "S":
+				totalSeconds += value
+			default:
+				return 0, fmt.Errorf("invalid unit in time part: %s", unit)
+			}
+		}
+		if matchedStr != timePart {
+			return 0, fmt.Errorf("invalid characters in time part: %s", timePart)
+		}
+	}
+
+	return time.Duration(totalSeconds * float64(time.Second)), nil
 }
 
 func parseEventDuration(eventData *string) time.Duration {
