@@ -136,7 +136,7 @@ func (e Event) fancyOutput() {
 		if e.Start.Add(time.Hour*24) == e.End {
 			fmt.Println(e.Summary)
 		} else {
-			fmt.Println(e.Summary + ` (until ` + e.End.Format(dateFormat) + `)`)
+			fmt.Println(e.Summary + ` (ends ` + e.End.Format(dateFormat) + `)`)
 		}
 	} else {
 		if showColor {
@@ -151,7 +151,7 @@ func (e Event) fancyOutput() {
 			fmt.Print(e.Start.Weekday().String()[0:3] + ` `)
 		}
 		fmt.Print(e.Start.Format(RFC822) + ` `)
-		fmt.Println(e.Summary + ` (until ` + e.End.Format(timeFormat) + `)`)
+		fmt.Println(e.Summary + ` (ends ` + e.End.Format(timeFormat) + `)`)
 
 	}
 
