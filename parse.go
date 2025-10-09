@@ -5,10 +5,9 @@ import (
 	"fmt"
 	// 	"log"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
-
-	duration "github.com/channelmeter/iso8601duration"
 )
 
 var (
@@ -132,15 +131,60 @@ func parseEventEnd(eventData *string) (time.Time, string) {
 	return parseTimeField("DTEND", *eventData)
 }
 
+// ParseISODuration parses an ISO 8601 duration string and returns a time.Duration
+// Supports format like PT1H30M45S (1 hour, 30 minutes, 45 seconds)
+func ParseISODuration(durationStr string) (time.Duration, error) {
+	if durationStr == "" {
+		return 0, nil
+	}
+
+	// Remove the 'P' prefix if present
+	if strings.HasPrefix(durationStr, "P") {
+		durationStr = durationStr[1:]
+	}
+
+	// Split by 'T' to separate date and time parts
+	parts := strings.Split(durationStr, "T")
+	var timePart string
+	if len(parts) > 1 {
+		timePart = parts[1]
+	} else {
+		timePart = parts[0]
+	}
+
+	var totalSeconds int64
+
+	// Parse time components (H, M, S)
+	timeRegex := regexp.MustCompile(`(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?`)
+	matches := timeRegex.FindStringSubmatch(timePart)
+
+	if len(matches) >= 4 {
+		if matches[1] != "" {
+			hours, _ := strconv.ParseInt(matches[1], 10, 64)
+			totalSeconds += hours * 3600
+		}
+		if matches[2] != "" {
+			minutes, _ := strconv.ParseInt(matches[2], 10, 64)
+			totalSeconds += minutes * 60
+		}
+		if matches[3] != "" {
+			seconds, _ := strconv.ParseInt(matches[3], 10, 64)
+			totalSeconds += seconds
+		}
+	}
+
+	return time.Duration(totalSeconds) * time.Second, nil
+}
+
 func parseEventDuration(eventData *string) time.Duration {
 	reDuration, _ := regexp.Compile(`DURATION:.*?\n`)
 	result := reDuration.FindString(*eventData)
 	trimmed := trimField(result, "DURATION:")
-	parsedDuration, err := duration.FromString(trimmed)
+	parsedDuration, err := ParseISODuration(trimmed)
 	var output time.Duration
 
 	if err == nil {
-		output = parsedDuration.ToDuration()
+		output = parsedDuration
 	}
 
 	return output
