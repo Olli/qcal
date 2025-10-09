@@ -254,7 +254,7 @@ func main() {
 	flag.BoolVar(&showInfo, "i", false, "Show additional info like description and location for appointments")
 	flag.BoolVar(&showFilename, "f", false, "Show appointment filename for editing or deletion")
 	flag.BoolVar(&displayFlag, "p", false, "Print ICS file piped to qcal (for CLI mail tools like mutt)")
-	flag.BoolVar(&showWeekday, "wd", false, "Show weekday")
+	noWeekday := flag.Bool("nwd", false, "Don't show weekday")
 	calNumber := flag.String("c", "all", "Show only single calendar (number)")
 	showToday := flag.Bool("t", false, "Show appointments for today")
 	show7days := flag.Bool("7", false, "Show 7 days from now")
@@ -270,6 +270,11 @@ func main() {
 	flag.Parse()
 	flagset := make(map[string]bool) // map for flag.Visit. get bools to determine set flags
 	flag.Visit(func(f *flag.Flag) { flagset[f.Name] = true })
+
+	// Set showWeekday based on nwd flag (weekday display is default, nwd disables it)
+	if *noWeekday {
+		showWeekday = false
+	}
 
 	if *showToday {
 		endDate = curTimeDay.UTC().AddDate(0, 0, 1).Format(IcsFormat) // today till tomorrow
