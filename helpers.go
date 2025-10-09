@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -111,6 +112,15 @@ func checkError(e error) {
 	}
 }
 
+func extractTeamsLinks(description string) []string {
+	re, _ := regexp.Compile(`https://teams\.microsoft\.com/l/meetup-join/[^\\s<>]+`)
+	links := re.FindAllString(description, -1)
+	for i, link := range links {
+		links[i] = strings.Trim(link, "<>")
+	}
+	return links
+}
+
 func inTimeSpan(start, end, check time.Time) bool {
 	return check.After(start) && check.Before(end)
 }
@@ -168,6 +178,17 @@ func (e Event) fancyOutput() {
 			for i := range e.Attendees {
 				fmt.Printf(`%17s`, ` `)
 				fmt.Println("Attendee: " + e.Attendees[i])
+			}
+		}
+	}
+
+	if showTeamsLinks {
+		if teamsLinks := extractTeamsLinks(e.Description); len(teamsLinks) > 0 {
+			fmt.Printf(`%17s`, ` `)
+			fmt.Println("Teams Meeting Links:")
+			for _, link := range teamsLinks {
+				fmt.Printf(`%17s`, ` `)
+				fmt.Printf("  - %s\n", link)
 			}
 		}
 	}

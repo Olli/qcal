@@ -251,6 +251,7 @@ func main() {
 	flag.StringVar(&startDate, "s", curTimeDay.Format(IcsFormat), "Start date")                                  // default yesterday
 	flag.StringVar(&endDate, "e", curTimeDay.AddDate(0, 0, config.DefaultNumDays).Format(IcsFormat), "End date") // default 1 month
 	flag.BoolVar(&showInfo, "i", false, "Show additional info like description and location for appointments")
+	flag.BoolVar(&showTeamsLinks, "tl", false, "Show only Teams meeting links from descriptions")
 	flag.BoolVar(&showFilename, "f", false, "Show appointment filename for editing or deletion")
 	flag.BoolVar(&displayFlag, "p", false, "Print ICS file piped to qcal (for CLI mail tools like mutt)")
 	noWeekday := flag.Bool("nwd", false, "Don't show weekday")
