@@ -62,6 +62,10 @@ This shows all appointments from 01.10.2021, 00:00h to 31.10.2021, 23:59:59
 
     qcal -s 20211001T000000 -e 20211031T235959
 
+This shows only past appointments for the last 30 days:
+
+    qcal -past 30
+
 This displays all avaliable calendars with their numbers and colors:
 
     qcal -l

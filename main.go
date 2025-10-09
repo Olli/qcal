@@ -262,6 +262,7 @@ func main() {
 	showMinutes := flag.Int("cron", 15, "Crontab mode. Show only appointments in the next n minutes.")
 	recurrence := flag.String("r", "", "Recurrency for new appointments. Use d,w,m,y with \"-n\"")
 	showCalendars := flag.Bool("l", false, "List configured calendars with their corresponding numbers (for \"-c\")")
+	pastDays := flag.Int("past", 0, "Show only past appointments for the last n days")
 	appointmentFile := flag.String("u", "", "Upload appointment file. Provide filename and use with \"-c\"")
 	appointmentDelete := flag.String("delete", "", "Delete appointment. Get filename with \"-f\" and use with \"-c\"")
 	appointmentDump := flag.String("d", "", "Dump raw appointment data. Get filename with \"-f\" and use with \"-c\"")
@@ -281,6 +282,10 @@ func main() {
 	}
 	if *show7days {
 		endDate = curTimeDay.UTC().AddDate(0, 0, 7).Format(IcsFormat) // today till 7 days
+	}
+	if flagset["past"] {
+		startDate = curTimeDay.AddDate(0, 0, -(*pastDays)).UTC().Format(IcsFormat)
+		endDate = curTimeDay.AddDate(0, 0, 1).UTC().Format(IcsFormat) // up to today
 	}
 	if *showCalendars {
 	}
