@@ -25,7 +25,7 @@ var endDateUTC string
 var summary string
 var toFile bool
 var elements []Event
-var qcalversion string = "0.9.2"
+var qcalversion string = "0.9.3"
 
 var colorBlock string = "|"
 var currentDot string = "•"

@@ -1,39 +1,16 @@
 # qcal Agent Guidelines
 
-## Build Commands
+## Build/Lint/Test Commands
 - Build: `make` (compiles to `qcal` binary)
 - Clean: `make clean`
 - Install: `sudo make install`
 - Cross-platform: `make darwin` (macOS), `make linux-arm`, `make windows`
-
-## Test Commands
-- No test suite exists - add `*_test.go` files and run `go test ./...`
+- Lint: `gofmt -l .` (check formatting), `go vet ./...` (static analysis)
+- Test: `go test ./...` (run all tests), `go test -run TestName` (run single test)
 
 ## Code Style Guidelines
-
-### Imports
-- Standard library imports first, sorted alphabetically
-- Third-party imports second
-- Blank line between import groups
-
-### Formatting
-- Use `gofmt` for consistent formatting
-- 4-space indentation (Go standard)
-- Line length: reasonable, break long lines
-
-### Types & Naming
-- Structs: PascalCase for exported fields (e.g., `Event`, `Href`, `Summary`)
-- Functions: camelCase (e.g., `fetchCalData`, `createAppointment`)
-- Constants: ALL_CAPS with underscores (e.g., `IcsFormat`, `ColDefault`)
-- Variables: camelCase, descriptive names
-
-### Error Handling
-- Fatal errors: `log.Fatal(err)` (terminates program)
-- Non-fatal: `checkError(e)` or return errors
-- HTTP errors: check `resp.Status` after requests
-
-### General
-- Minimal comments - focus on complex logic only
-- Use receiver methods for struct operations (e.g., `(e Event) fancyOutput()`)
-- Global config variables acceptable for CLI tools
-- Use `time.Time` for dates, parse with constants like `IcsFormat`
+- Imports: Standard library first (alphabetical), third-party second, blank line between groups.
+- Formatting: Use `gofmt`, 4-space indentation, reasonable line length.
+- Types & Naming: Structs PascalCase (e.g., `Event`), functions camelCase (e.g., `fetchCalData`), constants ALL_CAPS (e.g., `IcsFormat`), variables camelCase.
+- Error Handling: `log.Fatal(err)` for fatal, `checkError(e)` or return for non-fatal, check `resp.Status` for HTTP.
+- General: Minimal comments, receiver methods for structs (e.g., `(e Event)fancyOutput()`), global configs OK for CLI, use `time.Time` for dates.
