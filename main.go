@@ -243,14 +243,13 @@ END:VCALENDAR`
 
 func main() {
 	curTime := time.Now()
-	//curTimeDay := curTime.Truncate(24 * time.Hour).Add(-1) // NO! UTC only
-	// remove time, substract 1 msec for whole day appointments
-	curTimeDay := time.Date(curTime.Year(), curTime.Month(), curTime.Day(), 0, 0, 0, 0, time.Local).Add(-1)
+	// Calculate today in UTC to start from current day
+	curTimeDay := curTime.UTC().Truncate(24 * time.Hour)
 	//fmt.Println(curTimeDay)
 	toFile := false
 
-	flag.StringVar(&startDate, "s", curTimeDay.UTC().Format(IcsFormat), "Start date")                                  // default today
-	flag.StringVar(&endDate, "e", curTimeDay.UTC().AddDate(0, 0, config.DefaultNumDays).Format(IcsFormat), "End date") // default 1 month
+	flag.StringVar(&startDate, "s", curTimeDay.Format(IcsFormat), "Start date")                                  // default yesterday
+	flag.StringVar(&endDate, "e", curTimeDay.AddDate(0, 0, config.DefaultNumDays).Format(IcsFormat), "End date") // default 1 month
 	flag.BoolVar(&showInfo, "i", false, "Show additional info like description and location for appointments")
 	flag.BoolVar(&showFilename, "f", false, "Show appointment filename for editing or deletion")
 	flag.BoolVar(&displayFlag, "p", false, "Print ICS file piped to qcal (for CLI mail tools like mutt)")
@@ -278,14 +277,16 @@ func main() {
 	}
 
 	if *showToday {
-		endDate = curTimeDay.UTC().AddDate(0, 0, 1).Format(IcsFormat) // today till tomorrow
+		startDate = curTimeDay.Format(IcsFormat)                // today
+		endDate = curTimeDay.AddDate(0, 0, 1).Format(IcsFormat) // tomorrow
 	}
 	if *show7days {
-		endDate = curTimeDay.UTC().AddDate(0, 0, 7).Format(IcsFormat) // today till 7 days
+		startDate = curTimeDay.Format(IcsFormat)                // today
+		endDate = curTimeDay.AddDate(0, 0, 7).Format(IcsFormat) // 7 days from today
 	}
 	if flagset["past"] {
-		startDate = curTimeDay.AddDate(0, 0, -(*pastDays)).UTC().Format(IcsFormat)
-		endDate = curTimeDay.AddDate(0, 0, 1).UTC().Format(IcsFormat) // up to today
+		startDate = curTimeDay.AddDate(0, 0, -(*pastDays)).Format(IcsFormat)
+		endDate = curTimeDay.Format(IcsFormat) // up to today
 	}
 	if *showCalendars {
 	}

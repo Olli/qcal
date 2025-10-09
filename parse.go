@@ -112,10 +112,10 @@ func parseTimeField(fieldName string, eventData string) (time.Time, string) {
 			//t = time.In(myLocation)
 			t = thisTime.Local()
 		} else {
-			// Else, consider the timezone is local the parser
+			// Floating time, use configured timezone
 			format = "20060102T150405"
-			t, _ = time.Parse(format, dt)
-			//fmt.Println(t)
+			location, _ := time.LoadLocation(config.Timezone)
+			t, _ = time.ParseInLocation(format, dt, location)
 		}
 
 	}
