@@ -137,6 +137,4 @@ calendar config and leave the "Password" field empty:
 
 ## About
 
-Questions? Ideas? File bugs and TODOs through the [issue
-tracker](https://todo.sr.ht/~psic4t/qcal) or send an email to
-[~psic4t/qcal@todo.sr.ht](mailto:~psic4t/qcal@todo.sr.ht)
+Questions? Ideas? File bugs and TODOs through the issue tracker!
