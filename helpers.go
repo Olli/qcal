@@ -371,7 +371,11 @@ func uploadICS(calNumber string, eventFilePath string, eventEdit bool) (status s
 			eventFileName = genUUID() + `.ics` // no edit, so new filename
 		}
 	}
-	req, _ := http.NewRequest("PUT", config.Calendars[calNo].Url+eventFileName, strings.NewReader(eventICS))
+	// clean all METHODs from input ics since it's not allowed on a PUT
+	methodRegexp := regexp.MustCompile(`METHOD\:.*`)
+	cleanedICS := methodRegexp.ReplaceAllString(eventICS," ")
+	req, _ := http.NewRequest("PUT", config.Calendars[calNo].Url+eventFileName, strings.NewReader(cleanedICS))
+
 	req.SetBasicAuth(config.Calendars[calNo].Username, config.Calendars[calNo].password())
 	req.Header.Add("Content-Type", "text/calendar; charset=utf-8")
 
