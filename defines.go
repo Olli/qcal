@@ -6,32 +6,36 @@ import (
 	"time"
 )
 
-var err string
-var homedir string = os.Getenv("HOME")
-var editor string = os.Getenv("EDITOR")
-var configLocation string = (homedir + "/" + ConfigDir + "/config.json")
-var cacheLocation string = (homedir + "/" + CacheDir)
-var versionLocation string = (cacheLocation + "/version.json")
-var timezone, _ = time.Now().Zone()
-var xmlContent []byte
-var showInfo bool
-var showTeamsLinks bool
-var showFilename bool
-var displayFlag bool
-var startDate string
-var endDate string
-var startDateUTC string
-var endDateUTC string
-var summary string
-var toFile bool
-var elements []Event
-var qcalversion string = "0.9.3"
+var (
+	err             string
+	homedir         string = os.Getenv("HOME")
+	editor          string = os.Getenv("EDITOR")
+	configLocation  string = (homedir + "/" + ConfigDir + "/config.json")
+	cacheLocation   string = (homedir + "/" + CacheDir)
+	versionLocation string = (cacheLocation + "/version.json")
+	timezone, _            = time.Now().Zone()
+	xmlContent      []byte
+	showInfo        bool
+	showTeamsLinks  bool
+	showFilename    bool
+	displayFlag     bool
+	startDate       string
+	endDate         string
+	startDateUTC    string
+	endDateUTC      string
+	summary         string
+	toFile          bool
+	elements        []Event
+	qcalversion     string = "0.9.3"
+)
 
-var colorBlock string = "|"
-var currentDot string = "•"
-var Colors = [10]string{"\033[0;31m", "\033[0;32m", "\033[1;33m", "\033[1;34m", "\033[1;35m", "\033[1;36m", "\033[1;37m", "\033[1;38m", "\033[1;39m", "\033[1;40m"}
-var showColor bool = true
-var showWeekday bool = true
+var (
+	colorBlock  string = "|"
+	currentDot  string = "•"
+	Colors             = [10]string{"\033[0;31m", "\033[0;32m", "\033[1;33m", "\033[1;34m", "\033[1;35m", "\033[1;36m", "\033[1;37m", "\033[1;38m", "\033[1;39m", "\033[1;40m"}
+	showColor   bool   = true
+	showWeekday bool   = true
+)
 
 const (
 	ConfigDir      = ".config/qcal"
@@ -44,7 +48,7 @@ const (
 	IcsFormat   = "20060102T150405"
 	IcsFormatZ  = "20060102T150405Z"
 	IcsFormatTZ = "TZID=MST:20060102T150405"
-	//IcsFormatTZ         = "20060102T150405Z -0700"
+	// IcsFormatTZ         = "20060102T150405Z -0700"
 	IcsFormatWholeDay   = "20060102"
 	IcsFormatWholeMonth = "200601"
 	IcsFormatMonthDay   = "0102"
@@ -97,11 +101,11 @@ type xmlProps struct {
 }
 
 type xmlPropsError struct {
-	CalNo 			string
-	Url 				string
-	XMLName 		xml.Name 	`xml:"error"`
-	Exception 	string 		`xml:"exception"`
-	Message 		string 		`xml:"message"`
+	CalNo     string
+	Url       string
+	XMLName   xml.Name `xml:"error"`
+	Exception string   `xml:"exception"`
+	Message   string   `xml:"message"`
 }
 
 type calProps struct {

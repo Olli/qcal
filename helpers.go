@@ -30,7 +30,7 @@ func getConf() *configStruct {
 
 	conf := configStruct{}
 	err = json.Unmarshal(configData, &conf)
-	//fmt.Println(conf)
+	// fmt.Println(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -74,7 +74,6 @@ func getCalProp(calNo int, p *[]calProps, wg *sync.WaitGroup) {
 	cli := &http.Client{Transport: tr}*/
 	cli := &http.Client{}
 	resp, err := cli.Do(req)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -94,18 +93,18 @@ func getCalProp(calNo int, p *[]calProps, wg *sync.WaitGroup) {
 			fmt.Println(string(config.Calendars[calNo].Url))
 			log.Println(err)
 
-			// parse the xml error message 
-			xmlServerError := xmlPropsError{}	
+			// parse the xml error message
+			xmlServerError := xmlPropsError{}
 			err2 := xml.Unmarshal(xmlContent, &xmlServerError)
 			if err2 != nil {
 				// if it's not possible to parse the xml response
 				log.Println(string("Error parsing server xml error response"))
 				log.Fatal(err2)
 			}
-		
+
 			log.Println(string(xmlServerError.Exception))
 			log.Println(string(xmlServerError.Message))
-				
+
 		}
 		displayName = xmlProps.DisplayName
 	}
@@ -155,8 +154,8 @@ func (e Event) fancyOutput() {
 		}
 		fmt.Print(e.Start.Format(dateFormat) + ` `)
 		fmt.Printf(`%6s`, ` `)
-		//fmt.Println(e)
-		//if e.Start.Format(dateFormat) == e.End.Format(dateFormat) {
+		// fmt.Println(e)
+		// if e.Start.Format(dateFormat) == e.End.Format(dateFormat) {
 		if e.Start.Add(time.Hour*24) == e.End {
 			fmt.Println(e.Summary)
 		} else {
@@ -211,14 +210,15 @@ func (e Event) fancyOutput() {
 			fmt.Println(path.Base(e.Href))
 		}
 	}
-	//fmt.Println()
+	// fmt.Println()
 }
+
 func (e Event) icsOutput() {
 	// whole day or greater
 	fmt.Println(`Appointment
 ===========`)
-	//fmt.Printf(`Summary:%6s`, ` `)
-	//fmt.Print(e.Summary)
+	// fmt.Printf(`Summary:%6s`, ` `)
+	// fmt.Print(e.Summary)
 	fmt.Printf(`Summary:%6s`+e.Summary, ` `)
 	fmt.Println(``)
 	fmt.Printf(`Start:%8s`+e.Start.Format(RFC822), ` `)
@@ -255,7 +255,7 @@ func isNumeric(s string) bool {
 
 func deleteEvent(calNumber string, eventFilename string) (status string) {
 	calNo, _ := strconv.ParseInt(calNumber, 0, 64)
-	//fmt.Println(config.Calendars[calNo].Url + eventFilename)
+	// fmt.Println(config.Calendars[calNo].Url + eventFilename)
 
 	if eventFilename == "" {
 		log.Fatal("No event filename given")
@@ -279,7 +279,7 @@ func editEvent(calNumber string, eventFilename string) (status string) {
 	toFile = true
 	eventEdit := true
 	dumpEvent(calNumber, eventFilename, toFile)
-	//fmt.Println(appointmentEdit)
+	// fmt.Println(appointmentEdit)
 	filePath := cacheLocation + "/" + eventFilename
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
@@ -310,7 +310,7 @@ func editEvent(calNumber string, eventFilename string) (status string) {
 
 func dumpEvent(calNumber string, eventFilename string, toFile bool) (status string) {
 	calNo, _ := strconv.ParseInt(calNumber, 0, 64)
-	//fmt.Println(config.Calendars[calNo].Url + eventFilename)
+	// fmt.Println(config.Calendars[calNo].Url + eventFilename)
 
 	req, _ := http.NewRequest("GET", config.Calendars[calNo].Url+eventFilename, nil)
 	req.SetBasicAuth(config.Calendars[calNo].Username, config.Calendars[calNo].password())
@@ -321,13 +321,13 @@ func dumpEvent(calNumber string, eventFilename string, toFile bool) (status stri
 	if err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Println(resp.Status)
+	// fmt.Println(resp.Status)
 	xmlContent, _ := io.ReadAll(resp.Body)
 
 	if toFile {
 		// create cache dir if not exists
 		os.MkdirAll(cacheLocation, os.ModePerm)
-		err := os.WriteFile(cacheLocation+"/"+eventFilename, xmlContent, 0644)
+		err := os.WriteFile(cacheLocation+"/"+eventFilename, xmlContent, 0o644)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -340,7 +340,7 @@ func dumpEvent(calNumber string, eventFilename string, toFile bool) (status stri
 
 func uploadICS(calNumber string, eventFilePath string, eventEdit bool) (status string) {
 	calNo, _ := strconv.ParseInt(calNumber, 0, 64)
-	//fmt.Println(config.Calendars[calNo].Url + eventFilePath)
+	// fmt.Println(config.Calendars[calNo].Url + eventFilePath)
 
 	var icsData string
 	var eventICS string
@@ -352,13 +352,13 @@ func uploadICS(calNumber string, eventFilePath string, eventEdit bool) (status s
 		for scanner.Scan() {
 			icsData += scanner.Text() + "\n"
 		}
-		//eventICS, _ = explodeEvent(&icsData)
+		// eventICS, _ = explodeEvent(&icsData)
 		eventICS = icsData
 		eventFileName = genUUID() + `.ics`
 		fmt.Println(eventICS)
 
 	} else {
-		//eventICS, err := os.ReadFile(cacheLocation + "/" + eventFilename)
+		// eventICS, err := os.ReadFile(cacheLocation + "/" + eventFilename)
 		eventICSByte, err := os.ReadFile(eventFilePath)
 		if err != nil {
 			log.Fatal(err)
@@ -405,7 +405,6 @@ func displayICS() {
 	if err := scanner.Err(); err != nil {
 		log.Println(err)
 	}
-
 }
 
 func (c *calendar) password() string {
