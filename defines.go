@@ -96,6 +96,14 @@ type xmlProps struct {
 	LastModified string   `xml:"response>propstat>prop>getlastmodified"`
 }
 
+type xmlPropsError struct {
+	CalNo 			string
+	Url 				string
+	XMLName 		xml.Name 	`xml:"error"`
+	Exception 	string 		`xml:"exception"`
+	Message 		string 		`xml:"message"`
+}
+
 type calProps struct {
 	calNo       int
 	displayName string

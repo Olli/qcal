@@ -81,7 +81,7 @@ func getCalProp(calNo int, p *[]calProps, wg *sync.WaitGroup) {
 
 	xmlContent, _ := io.ReadAll(resp.Body)
 
-	//fmt.Println(string(xmlContent))
+	// fmt.Println(string(xmlContent))
 	defer resp.Body.Close()
 
 	var displayName string
@@ -91,7 +91,21 @@ func getCalProp(calNo int, p *[]calProps, wg *sync.WaitGroup) {
 		xmlProps := xmlProps{}
 		err = xml.Unmarshal(xmlContent, &xmlProps)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(string(config.Calendars[calNo].Url))
+			log.Println(err)
+
+			// parse the xml error message 
+			xmlServerError := xmlPropsError{}	
+			err2 := xml.Unmarshal(xmlContent, &xmlServerError)
+			if err2 != nil {
+				// if it's not possible to parse the xml response
+				log.Println(string("Error parsing server xml error response"))
+				log.Fatal(err2)
+			}
+		
+			log.Println(string(xmlServerError.Exception))
+			log.Println(string(xmlServerError.Message))
+				
 		}
 		displayName = xmlProps.DisplayName
 	}
