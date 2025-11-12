@@ -90,7 +90,7 @@ func getCalProp(calNo int, p *[]calProps, wg *sync.WaitGroup) {
 		xmlProps := xmlProps{}
 		err = xml.Unmarshal(xmlContent, &xmlProps)
 		if err != nil {
-			fmt.Println(string(config.Calendars[calNo].Url))
+			log.Println(string(config.Calendars[calNo].Url))
 			log.Println(err)
 
 			// parse the xml error message
